@@ -11,6 +11,10 @@ export default function ActionPicker() {
   const [selectedActions, setSelectedActions] = useState([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [customDescription, setCustomDescription] = useState('')
+  const [customUserMovement, setCustomUserMovement] = useState(0)
+  const [customLlmMovement, setCustomLlmMovement] = useState(0)
+  const [addingCustom, setAddingCustom] = useState(false)
 
   useEffect(() => {
     fetchActionLibrary()
@@ -37,6 +41,38 @@ export default function ActionPicker() {
     }
   }
 
+  const createCustomAction = async (e) => {
+    e.preventDefault()
+    if (!customDescription.trim()) return
+
+    setAddingCustom(true)
+    try {
+      const response = await axios.post('/api/actions/library', {
+        action_description: customDescription,
+        default_user_movement: parseInt(customUserMovement),
+        default_llm_movement: parseInt(customLlmMovement),
+        created_from_session_id: null
+      })
+
+      // Add to library and select it
+      const newAction = response.data
+      setActionLibrary([...actionLibrary, newAction])
+      if (selectedActions.length < 7) {
+        setSelectedActions([...selectedActions, newAction.library_id])
+      }
+
+      // Reset form
+      setCustomDescription('')
+      setCustomUserMovement(0)
+      setCustomLlmMovement(0)
+    } catch (error) {
+      console.error('Failed to create custom action:', error)
+      alert('Failed to create custom action')
+    } finally {
+      setAddingCustom(false)
+    }
+  }
+
   const createSession = async () => {
     if (selectedActions.length < 3) {
       alert('Please select at least 3 actions to track')
@@ -46,11 +82,8 @@ export default function ActionPicker() {
     setCreating(true)
     try {
       const response = await axios.post('/api/sessions/', {
-        session_name: sessionName || null
-      }, {
-        params: {
-          selected_action_ids: selectedActions
-        }
+        session_name: sessionName || null,
+        selected_action_ids: selectedActions
       })
       navigate(`/session/${response.data.session_id}`)
     } catch (error) {
@@ -81,22 +114,26 @@ export default function ActionPicker() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
           <h2 className="text-lg font-semibold text-blue-900 mb-2">
             Pick 3-7 actions for this session
           </h2>
           <p className="text-sm text-blue-800">
-            Choose the actions you're most likely to do during this work session. This keeps tracking quick and focused!
+            Choose from the library or create custom actions. Select what you'll likely do during this work session.
           </p>
           <p className="text-sm text-blue-700 mt-2">
             Selected: {selectedActions.length} / 7 {selectedActions.length >= 3 && '✓'}
           </p>
         </div>
 
-        {/* Action Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Left: Action Library (2/3 width) */}
+          <div className="lg:col-span-2">
+            <h3 className="text-md font-semibold text-gray-900 mb-4">Action Library</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {actionLibrary.map((action) => {
             const isSelected = selectedActions.includes(action.library_id)
             const isDisabled = !isSelected && selectedActions.length >= 7
@@ -141,6 +178,74 @@ export default function ActionPicker() {
               </button>
             )
           })}
+            </div>
+          </div>
+
+          {/* Right: Create Custom Action (1/3 width) */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <h3 className="text-md font-semibold text-gray-900 mb-4">Create Custom Action</h3>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <form onSubmit={createCustomAction} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      What will you do?
+                    </label>
+                    <textarea
+                      value={customDescription}
+                      onChange={(e) => setCustomDescription(e.target.value)}
+                      placeholder="e.g., Asked LLM to write tests"
+                      required
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-user-color text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Points
+                    </label>
+                    <input
+                      type="number"
+                      value={customUserMovement}
+                      onChange={(e) => setCustomUserMovement(e.target.value)}
+                      placeholder="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-user-color text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Positive = you gain control
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      LLM Points
+                    </label>
+                    <input
+                      type="number"
+                      value={customLlmMovement}
+                      onChange={(e) => setCustomLlmMovement(e.target.value)}
+                      placeholder="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-user-color text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Positive = LLM gains control
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={addingCustom || selectedActions.length >= 7}
+                    className="w-full px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    {addingCustom ? 'Adding...' : 'Create & Select'}
+                  </button>
+                  {selectedActions.length >= 7 && (
+                    <p className="text-xs text-red-600 text-center">
+                      Max 7 actions selected
+                    </p>
+                  )}
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Start Button */}

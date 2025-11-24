@@ -12,7 +12,6 @@ router = APIRouter()
 @router.post("/", response_model=GameSessionResponse, status_code=status.HTTP_201_CREATED)
 def create_session(
     session_data: GameSessionCreate,
-    selected_action_ids: List[int] = [],
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -25,7 +24,7 @@ def create_session(
     db.flush()  # Get session_id before committing
 
     # Add selected actions
-    for action_id in selected_action_ids:
+    for action_id in session_data.selected_action_ids:
         selected_action = SelectedAction(
             session_id=new_session.session_id,
             library_id=action_id

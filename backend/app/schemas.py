@@ -25,6 +25,7 @@ class TokenData(BaseModel):
 # Game Session schemas
 class GameSessionCreate(BaseModel):
     session_name: Optional[str] = None
+    selected_action_ids: list[int] = []
 
 class GameSessionUpdate(BaseModel):
     session_name: Optional[str] = None

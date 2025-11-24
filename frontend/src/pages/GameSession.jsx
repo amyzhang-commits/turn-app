@@ -17,6 +17,9 @@ export default function GameSession() {
   const [showCustom, setShowCustom] = useState(false)
   const [trackedActions, setTrackedActions] = useState([])
   const [selectedActionIds, setSelectedActionIds] = useState([])
+  const [sessionCustomActions, setSessionCustomActions] = useState([])
+  const [showEndDialog, setShowEndDialog] = useState(false)
+  const [actionsToSave, setActionsToSave] = useState([])
 
   useEffect(() => {
     fetchSession()
@@ -82,6 +85,18 @@ export default function GameSession() {
       }))
 
       setActions(prev => [response.data, ...prev])
+
+      // If this was a custom action, add it to sessionCustomActions for quick access
+      if (!libraryId && description) {
+        const customActionObj = {
+          action_description: description,
+          default_user_movement: userMov,
+          default_llm_movement: llmMov,
+          action_id: response.data.action_id
+        }
+        setSessionCustomActions(prev => [...prev, customActionObj])
+      }
+
       setSelectedAction(null)
       setShowCustom(false)
       setCustomAction('')
@@ -100,6 +115,15 @@ export default function GameSession() {
       null,
       action.default_user_movement,
       action.default_llm_movement
+    )
+  }
+
+  const handleCustomQuickAction = (customAction) => {
+    trackAction(
+      null,
+      customAction.action_description,
+      customAction.default_user_movement,
+      customAction.default_llm_movement
     )
   }
 
@@ -133,14 +157,42 @@ export default function GameSession() {
     }
   }
 
-  const endSession = async () => {
-    if (!confirm('Are you sure you want to end this session?')) return
+  const endSession = () => {
+    if (sessionCustomActions.length > 0) {
+      // Show dialog to save custom actions
+      setShowEndDialog(true)
+    } else {
+      // No custom actions, just end
+      confirmEndSession()
+    }
+  }
 
+  const confirmEndSession = async () => {
     try {
+      // Save selected custom actions to library
+      for (const action of actionsToSave) {
+        await axios.post('/api/actions/library', {
+          action_description: action.action_description,
+          default_user_movement: action.default_user_movement,
+          default_llm_movement: action.default_llm_movement,
+          created_from_session_id: parseInt(sessionId)
+        })
+      }
+
+      // End the session
       await axios.post(`/api/sessions/${sessionId}/end`)
       navigate('/dashboard')
     } catch (error) {
       console.error('Failed to end session:', error)
+      alert('Failed to end session')
+    }
+  }
+
+  const toggleActionToSave = (action) => {
+    if (actionsToSave.some(a => a.action_description === action.action_description)) {
+      setActionsToSave(actionsToSave.filter(a => a.action_description !== action.action_description))
+    } else {
+      setActionsToSave([...actionsToSave, action])
     }
   }
 
@@ -267,25 +319,55 @@ export default function GameSession() {
                   </button>
                 </form>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {actionLibrary
-                    .filter(action => selectedActionIds.length === 0 || selectedActionIds.includes(action.library_id))
-                    .map((action) => (
-                    <button
-                      key={action.library_id}
-                      onClick={() => handleLibraryAction(action)}
-                      className="text-left p-4 border-2 border-gray-200 rounded-lg hover:border-user-color hover:bg-blue-50 transition group"
-                    >
-                      <p className="text-sm font-medium text-gray-900 group-hover:text-user-color">
-                        {action.action_description}
-                      </p>
-                      <div className="flex gap-4 mt-2 text-xs text-gray-600">
-                        <span className="text-user-color">You: {action.default_user_movement > 0 ? '+' : ''}{action.default_user_movement}</span>
-                        <span className="text-llm-color">LLM: {action.default_llm_movement > 0 ? '+' : ''}{action.default_llm_movement}</span>
-                        <span className="ml-auto">Used {action.times_used}x</span>
+                <div className="space-y-4">
+                  {/* Library Actions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {actionLibrary
+                      .filter(action => selectedActionIds.length === 0 || selectedActionIds.includes(action.library_id))
+                      .map((action) => (
+                      <button
+                        key={action.library_id}
+                        onClick={() => handleLibraryAction(action)}
+                        className="text-left p-4 border-2 border-gray-200 rounded-lg hover:border-user-color hover:bg-blue-50 transition group"
+                      >
+                        <p className="text-sm font-medium text-gray-900 group-hover:text-user-color">
+                          {action.action_description}
+                        </p>
+                        <div className="flex gap-4 mt-2 text-xs text-gray-600">
+                          <span className="text-user-color">You: {action.default_user_movement > 0 ? '+' : ''}{action.default_user_movement}</span>
+                          <span className="text-llm-color">LLM: {action.default_llm_movement > 0 ? '+' : ''}{action.default_llm_movement}</span>
+                          <span className="ml-auto">Used {action.times_used}x</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Session Custom Actions */}
+                  {sessionCustomActions.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>Custom Actions from This Session</span>
+                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">New</span>
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {sessionCustomActions.map((action, index) => (
+                          <button
+                            key={`custom-${index}`}
+                            onClick={() => handleCustomQuickAction(action)}
+                            className="text-left p-4 border-2 border-purple-200 bg-purple-50 rounded-lg hover:border-purple-400 hover:bg-purple-100 transition group"
+                          >
+                            <p className="text-sm font-medium text-gray-900 group-hover:text-purple-700">
+                              {action.action_description}
+                            </p>
+                            <div className="flex gap-4 mt-2 text-xs text-gray-600">
+                              <span className="text-user-color">You: {action.default_user_movement > 0 ? '+' : ''}{action.default_user_movement}</span>
+                              <span className="text-llm-color">LLM: {action.default_llm_movement > 0 ? '+' : ''}{action.default_llm_movement}</span>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -337,6 +419,83 @@ export default function GameSession() {
           </div>
         )}
       </main>
+
+      {/* End Session Dialog */}
+      {showEndDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Save Custom Actions?</h2>
+              <p className="text-sm text-gray-600 mb-6">
+                You created {sessionCustomActions.length} custom action{sessionCustomActions.length === 1 ? '' : 's'} during this session.
+                Would you like to save any to your action library for future sessions?
+              </p>
+
+              <div className="space-y-3 mb-6">
+                {sessionCustomActions.map((action, index) => {
+                  const isSelected = actionsToSave.some(a => a.action_description === action.action_description)
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => toggleActionToSave(action)}
+                      className={`w-full text-left p-4 border-2 rounded-lg transition ${
+                        isSelected
+                          ? 'border-purple-400 bg-purple-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          isSelected ? 'bg-purple-500 border-purple-500' : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {action.action_description}
+                          </p>
+                          <div className="flex gap-4 mt-1 text-xs text-gray-600">
+                            <span className="text-user-color">
+                              You: {action.default_user_movement > 0 ? '+' : ''}{action.default_user_movement}
+                            </span>
+                            <span className="text-llm-color">
+                              LLM: {action.default_llm_movement > 0 ? '+' : ''}{action.default_llm_movement}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setActionsToSave([])
+                    confirmEndSession()
+                  }}
+                  className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+                >
+                  Skip & End Session
+                </button>
+                <button
+                  onClick={() => {
+                    confirmEndSession()
+                  }}
+                  className="px-6 py-2 bg-user-color text-white rounded-md hover:bg-blue-700 font-medium"
+                >
+                  {actionsToSave.length > 0 ? `Save ${actionsToSave.length} & End Session` : 'End Session'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
