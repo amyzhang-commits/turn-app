@@ -101,8 +101,8 @@ export default function ManageLibrary() {
 
   const getActionCategory = (action) => {
     const netUser = action.default_user_movement - action.default_llm_movement
-    if (netUser > 2) return { label: 'User Control', color: 'text-blue-700 bg-blue-100' }
-    if (netUser < -2) return { label: 'LLM Control', color: 'text-red-700 bg-red-100' }
+    if (netUser > 2) return { label: 'Human Advance', color: 'text-blue-700 bg-blue-100' }
+    if (netUser < -2) return { label: 'LLM Advance', color: 'text-red-700 bg-red-100' }
     return { label: 'Balanced', color: 'text-gray-700 bg-gray-100' }
   }
 
@@ -154,7 +154,7 @@ export default function ManageLibrary() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                User Control →
+                Human Advance →
               </button>
               <button
                 onClick={() => setSortBy('llm-favoring')}
@@ -164,7 +164,7 @@ export default function ManageLibrary() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                LLM Control →
+                LLM Advance →
               </button>
             </div>
           </div>

@@ -73,6 +73,13 @@ export default function ActionPicker() {
     }
   }
 
+  const getActionCategory = (action) => {
+    const netUser = action.default_user_movement - action.default_llm_movement
+    if (netUser > 2) return { label: 'Human Advance', color: 'text-blue-700 bg-blue-100' }
+    if (netUser < -2) return { label: 'LLM Advance', color: 'text-red-700 bg-red-100' }
+    return { label: 'Balanced', color: 'text-gray-700 bg-gray-100' }
+  }
+
   const createSession = async () => {
     if (selectedActions.length < 3) {
       alert('Please select at least 3 actions to track')
@@ -137,6 +144,7 @@ export default function ActionPicker() {
           {actionLibrary.map((action) => {
             const isSelected = selectedActions.includes(action.library_id)
             const isDisabled = !isSelected && selectedActions.length >= 7
+            const category = getActionCategory(action)
 
             return (
               <button
@@ -162,10 +170,15 @@ export default function ActionPicker() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      {action.action_description}
-                    </p>
-                    <div className="flex gap-4 mt-2 text-xs text-gray-600">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {action.action_description}
+                      </p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${category.color}`}>
+                        {category.label}
+                      </span>
+                    </div>
+                    <div className="flex gap-4 text-xs text-gray-600">
                       <span className="text-user-color">
                         You: {action.default_user_movement > 0 ? '+' : ''}{action.default_user_movement}
                       </span>
