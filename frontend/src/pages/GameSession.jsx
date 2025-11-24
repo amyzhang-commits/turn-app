@@ -15,10 +15,14 @@ export default function GameSession() {
   const [customLlmMovement, setCustomLlmMovement] = useState(0)
   const [loading, setLoading] = useState(true)
   const [showCustom, setShowCustom] = useState(false)
+  const [trackedActions, setTrackedActions] = useState([])
+  const [selectedActionIds, setSelectedActionIds] = useState([])
 
   useEffect(() => {
     fetchSession()
     fetchActionLibrary()
+    fetchTrackedActions()
+    fetchSelectedActions()
   }, [sessionId])
 
   const fetchSession = async () => {
@@ -39,6 +43,24 @@ export default function GameSession() {
       setActionLibrary(response.data)
     } catch (error) {
       console.error('Failed to fetch action library:', error)
+    }
+  }
+
+  const fetchTrackedActions = async () => {
+    try {
+      const response = await axios.get(`/api/actions/session/${sessionId}/actions`)
+      setTrackedActions(response.data)
+    } catch (error) {
+      console.error('Failed to fetch tracked actions:', error)
+    }
+  }
+
+  const fetchSelectedActions = async () => {
+    try {
+      const response = await axios.get(`/api/sessions/${sessionId}/selected-actions`)
+      setSelectedActionIds(response.data)
+    } catch (error) {
+      console.error('Failed to fetch selected actions:', error)
     }
   }
 
@@ -63,6 +85,9 @@ export default function GameSession() {
       setSelectedAction(null)
       setShowCustom(false)
       setCustomAction('')
+
+      // Refresh tracked actions
+      fetchTrackedActions()
     } catch (error) {
       console.error('Failed to track action:', error)
       alert('Failed to track action')
@@ -173,8 +198,8 @@ export default function GameSession() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Score Bars */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
+        {/* Score Bars - Sticky */}
+        <div className="sticky top-16 z-20 bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-lg font-semibold mb-4">Collaboration Balance</h2>
           <ScoreBars userScore={session.user_score} llmScore={session.llm_score} />
         </div>
@@ -243,7 +268,9 @@ export default function GameSession() {
                 </form>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {actionLibrary.map((action) => (
+                  {actionLibrary
+                    .filter(action => selectedActionIds.length === 0 || selectedActionIds.includes(action.library_id))
+                    .map((action) => (
                     <button
                       key={action.library_id}
                       onClick={() => handleLibraryAction(action)}
@@ -274,6 +301,39 @@ export default function GameSession() {
         {session.status === 'ended' && (
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 text-center">
             <p className="text-gray-800">This session has ended.</p>
+          </div>
+        )}
+
+        {/* Session History */}
+        {trackedActions.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Session History</h2>
+            <div className="space-y-3">
+              {trackedActions.map((action, index) => {
+                // Find the library action for description if library_id exists
+                const libraryAction = action.library_id
+                  ? actionLibrary.find(a => a.library_id === action.library_id)
+                  : null
+                const description = libraryAction?.action_description || action.action_description || 'Custom action'
+
+                return (
+                  <div key={action.action_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-gray-500">#{trackedActions.length - index}</span>
+                      <span className="text-sm text-gray-900">{description}</span>
+                    </div>
+                    <div className="flex gap-4 text-xs">
+                      <span className={`font-medium ${action.user_movement > 0 ? 'text-user-color' : action.user_movement < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                        You: {action.user_movement > 0 ? '+' : ''}{action.user_movement}
+                      </span>
+                      <span className={`font-medium ${action.llm_movement > 0 ? 'text-llm-color' : action.llm_movement < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                        LLM: {action.llm_movement > 0 ? '+' : ''}{action.llm_movement}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       </main>

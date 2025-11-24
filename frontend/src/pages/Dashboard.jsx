@@ -28,19 +28,8 @@ export default function Dashboard() {
 
   const createSession = async (e) => {
     e.preventDefault()
-    setCreating(true)
-
-    try {
-      const response = await axios.post('/api/sessions/', {
-        session_name: sessionName || null
-      })
-      navigate(`/session/${response.data.session_id}`)
-    } catch (error) {
-      console.error('Failed to create session:', error)
-      alert('Failed to create session')
-    } finally {
-      setCreating(false)
-    }
+    // Navigate to action picker instead of creating session directly
+    navigate('/action-picker', { state: { sessionName } })
   }
 
   const formatDate = (dateString) => {

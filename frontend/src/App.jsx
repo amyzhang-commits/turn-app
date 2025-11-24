@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
+import ActionPicker from './pages/ActionPicker'
 import GameSession from './pages/GameSession'
 
 function PrivateRoute({ children }) {
@@ -44,6 +45,11 @@ function App() {
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/action-picker" element={
+              <PrivateRoute>
+                <ActionPicker />
               </PrivateRoute>
             } />
             <Route path="/session/:sessionId" element={

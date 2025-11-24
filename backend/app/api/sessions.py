@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from app.database import get_db
-from app.models import User, GameSession
+from app.models import User, GameSession, SelectedAction
 from app.schemas import GameSessionCreate, GameSessionUpdate, GameSessionResponse
 from app.auth import get_current_user
 
@@ -12,6 +12,7 @@ router = APIRouter()
 @router.post("/", response_model=GameSessionResponse, status_code=status.HTTP_201_CREATED)
 def create_session(
     session_data: GameSessionCreate,
+    selected_action_ids: List[int] = [],
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -21,9 +22,43 @@ def create_session(
         status="active"
     )
     db.add(new_session)
+    db.flush()  # Get session_id before committing
+
+    # Add selected actions
+    for action_id in selected_action_ids:
+        selected_action = SelectedAction(
+            session_id=new_session.session_id,
+            library_id=action_id
+        )
+        db.add(selected_action)
+
     db.commit()
     db.refresh(new_session)
     return new_session
+
+@router.get("/{session_id}/selected-actions")
+def get_session_selected_actions(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verify session belongs to user
+    session = db.query(GameSession).filter(
+        GameSession.session_id == session_id,
+        GameSession.user_id == current_user.user_id
+    ).first()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found"
+        )
+
+    selected = db.query(SelectedAction).filter(
+        SelectedAction.session_id == session_id
+    ).all()
+
+    return [s.library_id for s in selected]
 
 @router.get("/", response_model=List[GameSessionResponse])
 def get_user_sessions(

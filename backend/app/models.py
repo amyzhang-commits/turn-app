@@ -31,6 +31,7 @@ class GameSession(Base):
     user = relationship("User", back_populates="game_sessions")
     logs = relationship("GameSessionLog", back_populates="session")
     tracked_actions = relationship("TrackedAction", back_populates="session")
+    selected_actions = relationship("SelectedAction", back_populates="session")
 
 class ActionLibrary(Base):
     __tablename__ = "action_library"
@@ -74,3 +75,14 @@ class GameSessionLog(Base):
     # Relationships
     session = relationship("GameSession", back_populates="logs")
     action = relationship("TrackedAction", back_populates="logs")
+
+class SelectedAction(Base):
+    __tablename__ = "selected_actions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, ForeignKey("game_session.session_id"), nullable=False)
+    library_id = Column(Integer, ForeignKey("action_library.library_id"), nullable=False)
+
+    # Relationships
+    session = relationship("GameSession", back_populates="selected_actions")
+    library_action = relationship("ActionLibrary")

@@ -40,7 +40,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
 
     # Create access token
-    access_token = create_access_token(data={"sub": user.user_id})
+    access_token = create_access_token(data={"sub": str(user.user_id)})
 
     return {"access_token": access_token, "token_type": "bearer"}
 
