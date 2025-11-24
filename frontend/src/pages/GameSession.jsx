@@ -243,6 +243,12 @@ export default function GameSession() {
               {session.session_name || `Session ${session.session_id}`}
             </h1>
             <div className="flex gap-2">
+              <button
+                onClick={() => window.open(`/api/sessions/${sessionId}/export`, '_blank')}
+                className="px-4 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                Export CSV
+              </button>
               {session.status === 'active' && (
                 <>
                   <button

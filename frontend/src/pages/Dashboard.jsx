@@ -99,8 +99,16 @@ export default function Dashboard() {
 
         {/* Sessions List */}
         <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-lg font-semibold">Your Sessions</h2>
+            {sessions.length > 0 && (
+              <button
+                onClick={() => window.open('/api/sessions/export-all', '_blank')}
+                className="px-4 py-2 text-sm bg-user-color text-white rounded-md hover:bg-blue-700 font-medium"
+              >
+                Export All Data
+              </button>
+            )}
           </div>
           <div className="divide-y divide-gray-200">
             {loading ? (
