@@ -183,8 +183,10 @@ export default function GameSession() {
       // Show dialog to save custom actions
       setShowEndDialog(true)
     } else {
-      // No custom actions, just end
-      confirmEndSession()
+      // No custom actions, show simple confirmation
+      if (confirm('Are you sure you want to end this session?')) {
+        confirmEndSession()
+      }
     }
   }
 
@@ -528,24 +530,35 @@ export default function GameSession() {
                 })}
               </div>
 
-              <div className="flex gap-3 justify-end">
+              <div className="flex gap-3 justify-between">
                 <button
                   onClick={() => {
+                    setShowEndDialog(false)
                     setActionsToSave([])
-                    confirmEndSession()
                   }}
-                  className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
                 >
-                  Skip & End Session
+                  Cancel
                 </button>
-                <button
-                  onClick={() => {
-                    confirmEndSession()
-                  }}
-                  className="px-6 py-2 bg-user-color text-white rounded-md hover:bg-blue-700 font-medium"
-                >
-                  {actionsToSave.length > 0 ? `Save ${actionsToSave.length} & End Session` : 'End Session'}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setActionsToSave([])
+                      confirmEndSession()
+                    }}
+                    className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+                  >
+                    Skip & End Session
+                  </button>
+                  <button
+                    onClick={() => {
+                      confirmEndSession()
+                    }}
+                    className="px-6 py-2 bg-user-color text-white rounded-md hover:bg-blue-700 font-medium"
+                  >
+                    {actionsToSave.length > 0 ? `Save ${actionsToSave.length} & End Session` : 'End Session'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
