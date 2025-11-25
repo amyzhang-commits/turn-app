@@ -57,6 +57,7 @@ class TrackedAction(Base):
     action_description = Column(Text, nullable=True)  # NULL when library_id is set
     user_movement = Column(Integer, nullable=False)
     llm_movement = Column(Integer, nullable=False)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     session = relationship("GameSession", back_populates="tracked_actions")

@@ -79,6 +79,7 @@ class TrackedActionResponse(BaseModel):
     action_description: Optional[str]
     user_movement: int
     llm_movement: int
+    timestamp: datetime
 
     class Config:
         from_attributes = True

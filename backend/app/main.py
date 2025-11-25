@@ -8,7 +8,7 @@ from app.models import Base
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Spade App API",
+    title="Turn API",
     description="Reflection support game for LLM collaboration",
     version="0.1.0"
 )
@@ -29,7 +29,7 @@ app.include_router(actions.router, prefix="/api/actions", tags=["actions"])
 
 @app.get("/")
 def root():
-    return {"message": "Spade App API is running"}
+    return {"message": "Turn API is running"}
 
 @app.get("/health")
 def health_check():

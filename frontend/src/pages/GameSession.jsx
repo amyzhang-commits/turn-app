@@ -219,6 +219,27 @@ export default function GameSession() {
     }
   }
 
+  const exportSessionData = async () => {
+    try {
+      const response = await axios.get(`/api/sessions/${sessionId}/export`, {
+        responseType: 'blob'
+      })
+
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `session_${sessionId}_export.csv`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Failed to export session data:', error)
+      alert('Failed to export session data. Please try again.')
+    }
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
@@ -244,7 +265,7 @@ export default function GameSession() {
             </h1>
             <div className="flex gap-2">
               <button
-                onClick={() => window.open(`/api/sessions/${sessionId}/export`, '_blank')}
+                onClick={exportSessionData}
                 className="px-4 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600"
               >
                 Export CSV

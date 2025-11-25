@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Get database URL from environment or use SQLite for local development
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./spade_app.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./turn_app.db")
 
 # Fix for Railway PostgreSQL URLs (they use postgres:// but SQLAlchemy needs postgresql://)
 if DATABASE_URL.startswith("postgres://"):

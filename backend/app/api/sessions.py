@@ -74,6 +74,91 @@ def get_user_sessions(
     sessions = query.order_by(GameSession.start_time.desc()).all()
     return sessions
 
+@router.get("/export-all")
+def export_all_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Get all sessions for user
+    sessions = db.query(GameSession).filter(
+        GameSession.user_id == current_user.user_id
+    ).order_by(GameSession.start_time.desc()).all()
+
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Write sessions summary
+    writer.writerow(['All Sessions Summary'])
+    writer.writerow(['Session ID', 'Session Name', 'Start Time', 'End Time', 'Status', 'User Score', 'LLM Score', 'Duration (minutes)', 'Total Actions'])
+
+    for session in sessions:
+        # Calculate duration
+        duration = ''
+        if session.end_time and session.start_time:
+            delta = session.end_time - session.start_time
+            duration = round(delta.total_seconds() / 60, 1)
+
+        # Count actions
+        action_count = db.query(TrackedAction).filter(
+            TrackedAction.session_id == session.session_id
+        ).count()
+
+        writer.writerow([
+            session.session_id,
+            session.session_name or 'Unnamed',
+            session.start_time,
+            session.end_time or 'Ongoing',
+            session.status,
+            session.user_score,
+            session.llm_score,
+            duration,
+            action_count
+        ])
+
+    writer.writerow([])
+    writer.writerow([])
+
+    # Write detailed actions for each session
+    writer.writerow(['Detailed Action Log'])
+    writer.writerow(['Timestamp', 'Session ID', 'Session Name', 'Action ID', 'Description', 'User Points', 'LLM Points', 'Source'])
+
+    for session in sessions:
+        tracked_actions = db.query(TrackedAction).filter(
+            TrackedAction.session_id == session.session_id
+        ).order_by(TrackedAction.timestamp.asc()).all()
+
+        for action in tracked_actions:
+            if action.library_id:
+                library_action = db.query(ActionLibrary).filter(
+                    ActionLibrary.library_id == action.library_id
+                ).first()
+                description = library_action.action_description if library_action else 'Unknown'
+                source = 'Library'
+            else:
+                description = action.action_description or 'Custom'
+                source = 'Custom'
+
+            writer.writerow([
+                action.timestamp,
+                session.session_id,
+                session.session_name or 'Unnamed',
+                action.action_id,
+                description,
+                action.user_movement,
+                action.llm_movement,
+                source
+            ])
+
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=turn_all_data_export.csv"
+        }
+    )
+
 @router.get("/{session_id}", response_model=GameSessionResponse)
 def get_session(
     session_id: int,
@@ -232,7 +317,7 @@ def export_session(
 
     # Write actions data
     writer.writerow(['Actions Tracked'])
-    writer.writerow(['Action ID', 'Description', 'User Points', 'LLM Points', 'Source'])
+    writer.writerow(['Timestamp', 'Action ID', 'Description', 'User Points', 'LLM Points', 'Source'])
 
     for action in tracked_actions:
         # Get description from library if available
@@ -247,6 +332,7 @@ def export_session(
             source = 'Custom (Session)'
 
         writer.writerow([
+            action.timestamp,
             action.action_id,
             description,
             action.user_movement,
@@ -260,89 +346,5 @@ def export_session(
         media_type="text/csv",
         headers={
             "Content-Disposition": f"attachment; filename=session_{session_id}_export.csv"
-        }
-    )
-
-@router.get("/export-all")
-def export_all_sessions(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    # Get all sessions for user
-    sessions = db.query(GameSession).filter(
-        GameSession.user_id == current_user.user_id
-    ).order_by(GameSession.start_time.desc()).all()
-
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
-
-    # Write sessions summary
-    writer.writerow(['All Sessions Summary'])
-    writer.writerow(['Session ID', 'Session Name', 'Start Time', 'End Time', 'Status', 'User Score', 'LLM Score', 'Duration (minutes)', 'Total Actions'])
-
-    for session in sessions:
-        # Calculate duration
-        duration = ''
-        if session.end_time and session.start_time:
-            delta = session.end_time - session.start_time
-            duration = round(delta.total_seconds() / 60, 1)
-
-        # Count actions
-        action_count = db.query(TrackedAction).filter(
-            TrackedAction.session_id == session.session_id
-        ).count()
-
-        writer.writerow([
-            session.session_id,
-            session.session_name or 'Unnamed',
-            session.start_time,
-            session.end_time or 'Ongoing',
-            session.status,
-            session.user_score,
-            session.llm_score,
-            duration,
-            action_count
-        ])
-
-    writer.writerow([])
-    writer.writerow([])
-
-    # Write detailed actions for each session
-    writer.writerow(['Detailed Action Log'])
-    writer.writerow(['Session ID', 'Session Name', 'Action ID', 'Description', 'User Points', 'LLM Points', 'Source'])
-
-    for session in sessions:
-        tracked_actions = db.query(TrackedAction).filter(
-            TrackedAction.session_id == session.session_id
-        ).all()
-
-        for action in tracked_actions:
-            if action.library_id:
-                library_action = db.query(ActionLibrary).filter(
-                    ActionLibrary.library_id == action.library_id
-                ).first()
-                description = library_action.action_description if library_action else 'Unknown'
-                source = 'Library'
-            else:
-                description = action.action_description or 'Custom'
-                source = 'Custom'
-
-            writer.writerow([
-                session.session_id,
-                session.session_name or 'Unnamed',
-                action.action_id,
-                description,
-                action.user_movement,
-                action.llm_movement,
-                source
-            ])
-
-    output.seek(0)
-    return StreamingResponse(
-        iter([output.getvalue()]),
-        media_type="text/csv",
-        headers={
-            "Content-Disposition": f"attachment; filename=spade_app_all_data_export.csv"
         }
     )

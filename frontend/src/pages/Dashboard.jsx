@@ -51,12 +51,33 @@ export default function Dashboard() {
     }
   }
 
+  const exportAllData = async () => {
+    try {
+      const response = await axios.get('/api/sessions/export-all', {
+        responseType: 'blob'
+      })
+
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'spade_app_all_data_export.csv')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Failed to export data:', error)
+      alert('Failed to export data. Please try again.')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Spade App</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Turn</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/manage-library')}
@@ -103,7 +124,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold">Your Sessions</h2>
             {sessions.length > 0 && (
               <button
-                onClick={() => window.open('/api/sessions/export-all', '_blank')}
+                onClick={exportAllData}
                 className="px-4 py-2 text-sm bg-user-color text-white rounded-md hover:bg-blue-700 font-medium"
               >
                 Export All Data

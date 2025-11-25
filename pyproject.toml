@@ -1,5 +1,5 @@
 [project]
-name = "spade-app"
+name = "turn"
 version = "0.1.0"
 description = "Reflection support game for LLM collaboration"
 readme = "README.md"
