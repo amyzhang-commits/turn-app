@@ -35,7 +35,7 @@ export default function ActionPicker() {
     if (selectedActions.includes(libraryId)) {
       setSelectedActions(selectedActions.filter(id => id !== libraryId))
     } else {
-      if (selectedActions.length < 7) {
+      if (selectedActions.length < 5) {
         setSelectedActions([...selectedActions, libraryId])
       }
     }
@@ -57,7 +57,7 @@ export default function ActionPicker() {
       // Add to library and select it
       const newAction = response.data
       setActionLibrary([...actionLibrary, newAction])
-      if (selectedActions.length < 7) {
+      if (selectedActions.length < 5) {
         setSelectedActions([...selectedActions, newAction.library_id])
       }
 
@@ -125,13 +125,13 @@ export default function ActionPicker() {
         {/* Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
           <h2 className="text-lg font-semibold text-blue-900 mb-2">
-            Pick 3-7 actions for this session
+            Pick 3-5 actions for this session
           </h2>
           <p className="text-sm text-blue-800">
             Choose from the library or create custom actions. Select what you'll likely do during this work session.
           </p>
           <p className="text-sm text-blue-700 mt-2">
-            Selected: {selectedActions.length} / 7 {selectedActions.length >= 3 && '✓'}
+            Selected: {selectedActions.length} / 5 {selectedActions.length >= 3 && '✓'}
           </p>
         </div>
 
@@ -143,7 +143,7 @@ export default function ActionPicker() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {actionLibrary.map((action) => {
             const isSelected = selectedActions.includes(action.library_id)
-            const isDisabled = !isSelected && selectedActions.length >= 7
+            const isDisabled = !isSelected && selectedActions.length >= 5
             const category = getActionCategory(action)
 
             return (
@@ -245,14 +245,14 @@ export default function ActionPicker() {
                   </div>
                   <button
                     type="submit"
-                    disabled={addingCustom || selectedActions.length >= 7}
+                    disabled={addingCustom || selectedActions.length >= 5}
                     className="w-full px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                   >
                     {addingCustom ? 'Adding...' : 'Create & Select'}
                   </button>
-                  {selectedActions.length >= 7 && (
+                  {selectedActions.length >= 5 && (
                     <p className="text-xs text-red-600 text-center">
-                      Max 7 actions selected
+                      Max 5 actions selected
                     </p>
                   )}
                 </form>
