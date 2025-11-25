@@ -20,94 +20,93 @@ def seed_action_library():
     # llm_movement: positive = LLM gains control, negative = LLM loses control
 
     starter_actions = [
+        # Human Advance (Net > +2)
         {
-            "action_description": "Asked LLM to explain code I wrote",
+            "action_description": "Pushed back on AI's suggestion and steered new direction",
+            "default_user_movement": 4,
+            "default_llm_movement": -1,
+            "user_created": False
+        },
+        {
+            "action_description": "Attempted my own explanation of a concept before asking AI",
+            "default_user_movement": 3,
+            "default_llm_movement": 0,
+            "user_created": False
+        },
+        {
+            "action_description": "Fact-checked AI's response before using it",
+            "default_user_movement": 3,
+            "default_llm_movement": 0,
+            "user_created": False
+        },
+        {
+            "action_description": "Created a draft myself first, then asked AI to review",
+            "default_user_movement": 4,
+            "default_llm_movement": 0,
+            "user_created": False
+        },
+
+        # Balanced (Net -2 to +2)
+        {
+            "action_description": "Put AI's explanation into my own words",
+            "default_user_movement": 2,
+            "default_llm_movement": 0,
+            "user_created": False
+        },
+        {
+            "action_description": "Asked a specific follow-up question to understand better",
             "default_user_movement": 2,
             "default_llm_movement": 1,
             "user_created": False
         },
         {
-            "action_description": "Asked LLM to write code from scratch",
+            "action_description": "Asked AI to critique my work",
+            "default_user_movement": 2,
+            "default_llm_movement": 1,
+            "user_created": False
+        },
+        {
+            "action_description": "Asked AI to quiz me on what I'm learning",
+            "default_user_movement": 2,
+            "default_llm_movement": 1,
+            "user_created": False
+        },
+        {
+            "action_description": "Worked with AI to learn a new concept",
+            "default_user_movement": 2,
+            "default_llm_movement": 1,
+            "user_created": False
+        },
+        {
+            "action_description": "Used AI-generated outline as starting point, then adapted",
+            "default_user_movement": 1,
+            "default_llm_movement": 2,
+            "user_created": False
+        },
+
+        # AI Advance (Net < -2)
+        {
+            "action_description": "Asked AI to summarize a long document",
+            "default_user_movement": -1,
+            "default_llm_movement": 2,
+            "user_created": False
+        },
+        {
+            "action_description": "Asked AI to write something from scratch for me",
             "default_user_movement": -2,
             "default_llm_movement": 3,
             "user_created": False
         },
         {
-            "action_description": "Copy-pasted LLM code without reading",
+            "action_description": "Used AI's output without verifying accuracy",
             "default_user_movement": -3,
             "default_llm_movement": 4,
             "user_created": False
         },
         {
-            "action_description": "Modified LLM's suggestion before using it",
-            "default_user_movement": 3,
-            "default_llm_movement": 1,
-            "user_created": False
-        },
-        {
-            "action_description": "Asked LLM to debug my code",
-            "default_user_movement": 0,
-            "default_llm_movement": 2,
-            "user_created": False
-        },
-        {
-            "action_description": "Rejected LLM's suggestion and wrote my own",
-            "default_user_movement": 4,
-            "default_llm_movement": -1,
-            "user_created": False
-        },
-        {
-            "action_description": "Asked LLM for ideas/brainstorming",
-            "default_user_movement": 2,
-            "default_llm_movement": 1,
-            "user_created": False
-        },
-        {
-            "action_description": "Used LLM to refactor code I understand",
-            "default_user_movement": 1,
-            "default_llm_movement": 2,
-            "user_created": False
-        },
-        {
-            "action_description": "Asked LLM to add a feature to existing code",
-            "default_user_movement": -1,
-            "default_llm_movement": 3,
-            "user_created": False
-        },
-        {
-            "action_description": "Read and understood LLM's explanation",
-            "default_user_movement": 3,
-            "default_llm_movement": 0,
-            "user_created": False
-        },
-        {
-            "action_description": "Asked follow-up questions to understand better",
-            "default_user_movement": 3,
-            "default_llm_movement": 0,
-            "user_created": False
-        },
-        {
-            "action_description": "Let LLM handle something I could do myself",
-            "default_user_movement": -2,
-            "default_llm_movement": 3,
-            "user_created": False
-        },
-        {
-            "action_description": "Wrote code myself first, then asked LLM to review",
-            "default_user_movement": 4,
-            "default_llm_movement": -1,
-            "user_created": False
-        },
-        {
-            "action_description": "Asked LLM to optimize my working code",
-            "default_user_movement": 2,
-            "default_llm_movement": 1,
-            "user_created": False
-        },
-        {
-            "action_description": "Used LLM to learn a new concept/library",
-            "default_user_movement": 2,
-            "default_llm_movement": 1,
+            "action_description": "Copy-pasted AI response without reading it",
+            "default_user_movement": -3,
+            "default_llm_movement": 4,
             "user_created": False
         },
     ]
