@@ -1,4 +1,4 @@
-# Spade App
+# Turn App
 
 A gamified reflection support tool to help users be more mindful about their collaboration patterns with LLMs.
 
@@ -109,7 +109,7 @@ git push -u origin main
 
 3. **Add PostgreSQL Database:**
    - In your Railway project, click "New"
-   - Select "Database" ’ "PostgreSQL"
+   - Select "Database" â€™ "PostgreSQL"
    - Railway will automatically create a `DATABASE_URL` environment variable
 
 4. **Configure Environment Variables:**
@@ -125,7 +125,7 @@ git push -u origin main
 
 6. **Run Database Seed:**
    After first deployment, seed the action library:
-   - Go to Railway dashboard ’ your service ’ "Settings" ’ "Deploy"
+   - Go to Railway dashboard â€™ your service â€™ "Settings" â€™ "Deploy"
    - Or SSH into the service and run: `python backend/seed_data.py`
 
 7. **Get Your URL:**
