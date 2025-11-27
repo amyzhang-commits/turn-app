@@ -1,8 +1,12 @@
 # Turn App
 
-A gamified reflection support tool to help users be more mindful about their collaboration patterns with LLMs.
+A gamified reflection support tool to help users track their collaboration patterns with LLMs.
 
-Track whether you're being more active or passive in your work with AI assistants. Visualize the balance between user control and LLM assistance through competing progress bars.
+Find out whether you're being more active or passive in your work with AI assistants (and what those dynamics specifically mean for you 👀). Visualize the balance between your own growth and LLM assistance through competing progress bars.
+
+**Built for:** Educators, students, and anyone curious about their relationship with AI assistants.
+
+![Turn App Interface](images/turn-screenshot.png)
 
 ## Features
 
