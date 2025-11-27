@@ -1,4 +1,4 @@
-# 🎮 Turn: Vision & Research Goals
+# 🔄 Turn: Vision & Research Goals
 
 ## What is Turn?
 
@@ -6,30 +6,30 @@ Turn is a **gamified reflection tool** that helps people become more aware of th
 
 ## The Core Metaphor: Turn
 
-In card games, taking turns represents effort, work, and intentionality. This app asks: **Whose turn is it?**
+The technical term for every interaction in the conversation with an LLM is a 'turn'. We join this with the context of turn-based games to create an app that asks, **Whose turn is it**--to make a move, to flex their agency?
 
-When you work with an LLM, every interaction moves the "control balance" somewhere:
+When you work with an LLM, every interaction moves the "growth balance" somewhere:
 - **You advance** when you actively shape, critique, or guide the AI
 - **LLM advances** when you passively accept outputs without engagement
-- **Balanced moves** represent genuine collaboration
+- **Balanced moves** approach genuine teamwork
 
-The goal isn't to "beat" the LLM or keep it from advancing - it's to **notice your patterns** and decide if they serve your goals.
+The goal isn't to "beat" the LLM -- and even less so to beat yourself up. Turn is a device meant to help you **notice your patterns**, be objective in your (self) assessments, and decide what changes might better serve your goals.
 
 ## Why This Matters
 
-As LLMs become more capable, there's a risk of "learned helplessness" where humans:
-- Stop understanding their own code
-- Lose the ability to debug without AI assistance
-- Become less creative problem solvers
-- Miss opportunities for deep learning
+LLMs are staggeringly capable—producing outputs at many times the speed of a single individual, and sometimes, especially when you're venturing outside a familiar domain, of much higher caliber.
 
-But there's also a risk of **rejecting useful collaboration** out of pride or fear.
+While many of us embrace the possibilities of this new creative relationship, the question of balance looms large. How much should we lean on the tireless machine versus our own efforts? Debates rage on, while justifiably concerned parents and educators hastily assemble lists of Do's and Don'ts.
 
-**Turn says:** There's no "right" way to work with LLMs. But **awareness** is essential. Track your patterns, reflect on them, and make intentional choices about your human-AI workflow.
+The goal of Turn is to…well…*turn* the general sense of unease into something we can objectively assess. You feel like you're probably getting overly reliant—but in what ways, and is it as often as you imagine? If there's a problem, we can only tackle it when we're clear on the current situation.
 
-## The Research Vision
+And speaking of the current situation: Turn invites us to notice that while learning will always require friction—the kind LLMs can seem to make optional—industrial-era constructs like "productivity" and "efficiency" are in a real moment of flux.
 
-This isn't just a personal productivity tool - it's a **public ethnographic database** of human-LLM collaboration.
+We're accomplishing tasks we couldn't have undertaken before, or doing classical tasks in entirely new ways. Before judging outright, how about just *tracking* what patterns emerge as we navigate this landscape of working hard and working smart?
+
+## EXPANDED: The Research Vision
+
+Beyond a kind of personal productivity tool, Turn hopes to be a **public ethnographic database** of human-LLM collaboration.
 
 ### Research Questions We Can Explore:
 
@@ -202,35 +202,11 @@ You → Deploy to your own Railway/Heroku/VPS
 
 ## Contact & Community
 
-- **GitHub:** [github.com/yourusername/turn-app](https://github.com/yourusername/turn-app)
+- **GitHub:** [github.com/amyzhang-commits/turn-app](https://github.com/amyzhang-commits/turn-app)
 - **Issues:** Use GitHub issues for bugs/features
 - **Discussions:** Use GitHub Discussions for questions/ideas
-- **Research inquiries:** [your email or contact form]
+- **Research inquiries:** amy.pairtree@gmail.com
 
 ---
 
-## A Note on the Name
-
-**Turn** captures multiple meanings:
-- 🔄 Taking turns - the back-and-forth of human-AI collaboration
-- 🎮 "Your turn" - active engagement, agency, intentionality
-- 📖 "Turn the page" - moving forward, reflection, new chapters
-- 🔍 "Turn your attention to..." - mindful awareness of patterns
-
-The name emphasizes that collaboration is a dynamic exchange, not a zero-sum game. Sometimes it's your turn to lead, sometimes the AI's - and that's okay.
-
----
-
-## Final Thoughts
-
-This project emerges from a belief that **tools shape thinking**.
-
-By making collaboration patterns *visible* and *trackable*, we create space for reflection. By making this reflection *public* (when people choose), we enable collective learning about this profound shift in how humans create.
-
-We don't know yet what the "right" patterns are. Maybe there aren't universal answers. But we can learn together, and we can help each other stay intentional, curious, and human as AI becomes more capable.
-
-Your turn. 🔄
-
----
-
-**This document was created in collaboration with Claude (Anthropic) - a fitting origin for a tool about human-AI collaboration. The irony is not lost on us.** 😄
+**This document was created in collaboration with Claude (Anthropic) - a fitting origin for a tool about human-AI collaboration. Embracing the moment!** 😄
