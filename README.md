@@ -8,6 +8,18 @@ Find out whether you're being more active or passive in your work with AI assist
 
 ![Turn App Interface](images/turn-screenshot.png)
 
+## 🚧 Current Status: Developer Preview
+
+**This is an early prototype!** The core tracking functionality works, but there are some important caveats:
+
+- **Setup required**: Currently requires local installation (Python + Node.js). No hosted version available yet.
+- **Mobile experience**: The biggest priority for v2! Right now you'd need to switch between browser tabs during work sessions, which isn't ideal. We're exploring PWA and mobile-first solutions.
+- **Active development**: Expect rough edges and ongoing changes.
+
+**Who should try this now?** Developers, researchers, and early adopters comfortable with local setup who want to explore human-AI collaboration patterns.
+
+See [VISION.md](VISION.md) for the longer-term roadmap, including plans for easier deployment and mobile accessibility.
+
 ## Features
 
 - **Real-time Score Tracking**: Two competing bars showing user vs LLM control
